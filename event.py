@@ -214,12 +214,12 @@ class RiderRequest(Event):
         @rtype: list[Event]
         """
         monitor.notify(self.timestamp, RIDER, REQUEST,
-                       self.rider.id, self.rider.origin)
+                       self.rider.id, self.rider.location)
 
         events = []
         driver = dispatcher.request_driver(self.rider)
         if driver is not None:
-            travel_time = driver.start_drive(self.rider.origin)
+            travel_time = driver.start_drive(self.rider.location)
             events.append(Pickup(self.timestamp + travel_time, self.rider, driver))
         events.append(Cancellation(self.timestamp + self.rider.patience, self.rider))
         return events
@@ -271,10 +271,15 @@ class DriverRequest(Event):
         # TODO
 
         monitor.notify(self.timestamp, DRIVER, REQUEST,
-                       self.driver.id, self.driver.destination)
+                       self.driver.id, self.driver.location)
+        rider = dispatcher.request_rider(self.driver)
+
         events = []
-
-
+        #start drive and create pick up event, the pick up event do() creates the drop off event!!
+        if rider is not None:
+            expectedTravelTime = self.driver.start_drive(rider.location)
+            events.append(Pickup(expectedTravelTime + self.timestamp,self.driver,rider))
+        return events
     def __str__(self):
         """Return a string representation of this event.
 
@@ -370,11 +375,11 @@ def create_event_list(filename):
                 # TODO
                 # Create a RiderRequest event.
                 riderIdentification = tokens[2]
-                riderOrigin = deserialize_location(tokens[3])
+                riderLocation= deserialize_location(tokens[3])
                 riderDestination = deserialize_location(tokens[4])
                 riderPatience = int(tokens[5])
                 #is that all added to event?
-                rider  = Rider(riderIdentification,"",riderDestination,riderOrigin,riderPatience)
+                rider  = Rider(riderIdentification,"",riderDestination,riderLocation,riderPatience)
                 event.append(RiderRequest(timestamp,rider))
 
             events.append(event)
