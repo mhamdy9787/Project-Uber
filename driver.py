@@ -27,7 +27,7 @@ class Driver:
         self.id  = identifier
         self.location = location
         self.speed = speed
-        self.destination = None #LocationClass?
+        self.destination = None
 
     def __str__(self):
         """Return a string representation.
@@ -56,7 +56,7 @@ class Driver:
         @rtype: int
         """
         # TODO
-        return ( abs(self.location.row - destination.row) + abs(self.location.column - destination.column) ) // self.speed
+        return manhattan_distance(self.location,destination) // self.speed
 
     def start_drive(self, location):
         """Start driving to the location and return the time the drive will take.
@@ -66,7 +66,8 @@ class Driver:
         @rtype: int
         """
         # TODO
-        pass
+        self.destination = location
+        return manhattan_distance(self.location,self.destination) // self.speed
 
     def end_drive(self):
         """End the drive and arrive at the destination.
@@ -77,7 +78,8 @@ class Driver:
         @rtype: None
         """
         # TODO
-        pass
+        #not sure if complete
+        self.location = self.destination
 
     def start_ride(self, rider):
         """Start a ride and return the time the ride will take.
@@ -87,7 +89,9 @@ class Driver:
         @rtype: int
         """
         # TODO
-        pass
+        self.destination = rider.destination
+        return manhattan_distance(self.location,self.destination) // self.speed
+
 
     def end_ride(self):
         """End the current ride, and arrive at the rider's destination.
