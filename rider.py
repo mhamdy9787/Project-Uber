@@ -24,5 +24,5 @@ class Rider:
         self.id = identifier
         self.status = status
         self.destination = destination #locationClass
-        self.origin = origin #locationClass
+        self.location = origin #locationClass
         self.patience = patience
