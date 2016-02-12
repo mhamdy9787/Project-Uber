@@ -78,8 +78,9 @@ class Dispatcher:
         else:
             longestWaitingRider = self.waitingList[0]
             for rider in self.waitingList:
-                if longestWaitingRider.patience < rider.patience:
-                    #NOT FINNISHED
+                if longestWaitingRider.patience  > rider.patience:
+                    longestWaitingRider = rider
+        return longestWaitingRider
 
 
 
