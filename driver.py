@@ -89,7 +89,7 @@ class Driver:
         @rtype: int
         """
         # TODO
-        self.destination = rider.destination
+        self.location = rider.location
         return manhattan_distance(self.location,self.destination) // self.speed
 
 
