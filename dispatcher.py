@@ -94,4 +94,4 @@ class Dispatcher:
         @rtype: None
         """
         # TODO
-        pass
+        self.waitingList.remove(rider)
