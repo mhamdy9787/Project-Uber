@@ -321,13 +321,29 @@ class Cancellation(Event):
 
 
 class Pickup(Event):
-    # TODO
-    pass
+    def __init__(self,driver,rider):
+        self.driver = driver()
+        self.rider = rider()
+
+    def do(self):
+        if self.rider.waiting:
+            self.driver.start_ride(self.rider) #def start_ride() ==> self.location = self.destination
+            drop = Dropoff
+        elif self.rider.canceled:
+            request = DriverRequest
+            self.driver.destination = None
 
 
 class Dropoff(Event):
-    # TODO
-    pass
+    def __init__(self,driver,rider):
+        self.driver = Pickup.driver
+        self.rider = Pickup.rider
+
+    def do(self):
+        self.driver.end_ride()
+        self.rider.satisfied = True
+        request = DriverRequest
+        self.driver.destination = None
 
 
 def create_event_list(filename):
