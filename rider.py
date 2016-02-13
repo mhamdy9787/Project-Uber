@@ -26,3 +26,7 @@ class Rider:
         self.destination = destination #locationClass
         self.location = origin #locationClass
         self.patience = patience
+
+    def updateStatus(self,newStatus):
+
+        self.status = newStatus
