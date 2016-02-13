@@ -290,60 +290,76 @@ class DriverRequest(Event):
 
 
 class Cancellation(Event):
-    # TODO
-    def __str__(self):
-        """Return a string representation of this event.
 
-        @type self: Event
-        @rtype: str
-        """
-        pass
+    def __init__(self,timestamp,rider):
+        super().__init__(timestamp)
+        self.rider = rider
+
     def do(self, dispatcher, monitor):
-        """Do this Event.
-
-        Update the state of the simulation, using the dispatcher, and any
-        attributes according to the meaning of the event.
-
-        Notify the monitor of any activities that have occurred during the
-        event.
-
-        Return a list of new events spawned by this event (making sure the
-        timestamps are correct).
-
-        Note: the "business logic" of what actually happens should not be
-        handled in any Event classes.
-
-        @type self: Event
-        @type dispatcher: Dispatcher
-        @type monitor: Monitor
-        @rtype: list[Event]
         """
 
+        """
+        monitor.notify(self.timestamp, RIDER, CANCEL,self.rider.id,self.rider.location)
+        events = []
+        dispatcher.cancel_ride(self.rider)
+        self.rider.updateStatus(CANCELLED)
+
+        return events
+
+    def __str__(self):
+        """
+        """
+        return "{} -- {}: Cancellation".format(self.timestamp, self.rider)
 
 class Pickup(Event):
-    def __init__(self,driver,rider):
-        self.driver = driver()
-        self.rider = rider()
 
-    def do(self):
-        if self.rider.waiting:
-            self.driver.start_ride(self.rider) #def start_ride() ==> self.location = self.destination
-            drop = Dropoff
-        elif self.rider.canceled:
-            request = DriverRequest
-            self.driver.destination = None
+    def __init__(self,timestamp,rider,driver):
+        super().__init__(timestamp)
+        self.driver = driver
+        self.rider = rider
+
+    def do(self,dispatcher,monitor):
+        self.driver.end_drive()
+        monitor.notify(self.timestamp,RIDER,PICKUP,self.rider.id,self.rider.location)
+        events = []
+        if self.rider.status == WAITING:
+            expectedRideTime = self.driver.start_ride(self.rider) #def start_ride() ==> self.location = self.destination
+            events.append(Dropoff(self.timestamp + expectedRideTime,self.driver,self.rider))
+        elif self.rider.status == CANCEL:
+            events.append(DriverRequest(self.timestamp,self.driver))
+            #WHEN IS CANCEL-RIDE CALLED ? (EVENT CLASS)
+        return events
+    def __str__(self):
+        """
+        """
+        return "{} -- {}: Pick up".format(self.timestamp, self.driver)
 
 
 class Dropoff(Event):
-    def __init__(self,driver,rider):
-        self.driver = Pickup.driver
-        self.rider = Pickup.rider
 
-    def do(self):
+    def __init__(self,timestamp,driver,rider):
+        super().__init__(timestamp)
+        self.driver = driver
+        self.rider = rider
+
+    def do(self,dispatcher,monitor):
+        events = []
+        monitor.notify(self.timestamp,RIDER,DROPOFF,self.rider,self.driver.location)
+
         self.driver.end_ride()
-        self.rider.satisfied = True
-        request = DriverRequest
-        self.driver.destination = None
+
+        self.rider.updateStatus(SATISFIED)
+
+        events.append(DriverRequest(self.timestamp,self.driver))
+
+        return events
+    def __str__(self):
+        """Return a string representation of this event.
+
+        @type self: RiderRequest
+        @rtype: str
+        """
+        return "{} -- {}: Drop off".format(self.timestamp, self.rider)
 
 
 def create_event_list(filename):
@@ -395,7 +411,7 @@ def create_event_list(filename):
                 riderDestination = deserialize_location(tokens[4])
                 riderPatience = int(tokens[5])
                 #is that all added to event?
-                rider  = Rider(riderIdentification,"",riderDestination,riderLocation,riderPatience)
+                rider  = Rider(riderIdentification,WAITING,riderDestination,riderLocation,riderPatience)
                 event.append(RiderRequest(timestamp,rider))
 
             events.append(event)
