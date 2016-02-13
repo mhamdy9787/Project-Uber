@@ -89,8 +89,8 @@ class Driver:
         @rtype: int
         """
         # TODO
-        self.location = rider.location
-        return manhattan_distance(self.location,self.destination) // self.speed
+        self.destination = rider.destination
+        return manhattan_distance(self.location,rider.destination) // self.speed
 
 
     def end_ride(self):
@@ -103,4 +103,5 @@ class Driver:
         @rtype: None
         """
         # TODO
-        pass
+        self.location = self.destination
+        self.destination = None
