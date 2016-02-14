@@ -80,6 +80,7 @@ class Driver:
         # TODO
         #not sure if complete
         self.location = self.destination
+        self.destination = None #Ask 
 
     def start_ride(self, rider):
         """Start a ride and return the time the ride will take.
