@@ -86,7 +86,7 @@ class Dispatcher:
 
 
 
-    def cancel_ride(self, rider):#Ask Prof
+    def cancel_ride(self, rider):
         """Cancel the ride for rider.
 
         @type self: Dispatcher
