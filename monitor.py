@@ -1,3 +1,5 @@
+
+
 """
 The Monitor module contains the Monitor class, the Activity class,
 and a collection of constants. Together the elements of the module
@@ -147,7 +149,15 @@ class Monitor:
         @rtype: float
         """
         # TODO
-        pass
+        distance = 0
+        numberOfDriver = 0
+        for activities in self._activities[DRIVER].values():
+            for i in range(len(activities) -1):
+                distance += abs(activities[i].location.row - activities[i+1].location.row) + abs(activities[i].location.column - activities[i+1].location.column)
+            numberOfDriver += 1
+
+        return  distance / numberOfDriver
+
 
     def _average_ride_distance(self):
         """Return the average distance drivers have driven on rides.
@@ -156,4 +166,12 @@ class Monitor:
         @rtype: float
         """
         # TODO
-        pass
+        averageRideDistance = 0
+        count = 0
+
+        for activity in self._activities[RIDER].values():
+            if len(activity) >= 3:
+                averageRideDistance += abs( activity[1].location.row - activity[2].location.row ) + abs(activity[1].location.column - activity[2].location.column)
+                count += 1
+
+        return averageRideDistance / count
