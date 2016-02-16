@@ -320,12 +320,16 @@ class Pickup(Event):
 
     def do(self,dispatcher,monitor):
         self.driver.end_drive()
-        monitor.notify(self.timestamp,RIDER,PICKUP,self.rider.id,self.rider.location)
+
         events = []
         if self.rider.status == WAITING:
+
+            monitor.notify(self.timestamp,RIDER,PICKUP,self.rider.id,self.rider.location)
+            monitor.notify(self.timestamp,DRIVER,PICKUP,self.driver.id,self.driver.location)#ASKKK!!!
             expectedRideTime = self.driver.start_ride(self.rider) #def start_ride() ==> self.location = self.destination
             events.append(Dropoff(self.timestamp + expectedRideTime,self.driver,self.rider))
         elif self.rider.status == CANCEL:
+
             events.append(DriverRequest(self.timestamp,self.driver))
             #WHEN IS CANCEL-RIDE CALLED ? (EVENT CLASS)
         return events
@@ -344,10 +348,9 @@ class Dropoff(Event):
 
     def do(self,dispatcher,monitor):
         events = []
-        monitor.notify(self.timestamp,RIDER,DROPOFF,self.rider,self.driver.location)
-
         self.driver.end_ride()
-
+        monitor.notify(self.timestamp,RIDER,DROPOFF,self.rider.id,self.driver.location)
+        #monitor.notify(self.timestamp,DRIVER,DROPOFF,self.rider,self.driver.location)
         self.rider.updateStatus(SATISFIED)
 
         events.append(DriverRequest(self.timestamp,self.driver))
