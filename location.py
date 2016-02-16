@@ -48,5 +48,5 @@ def deserialize_location(location_str):
     @rtype: Location
     """
     # TODO
-    location  = Location(int(location_str[0]),int(location_str[1]))
+    location  = Location(int(location_str[0]),int(location_str[2]))
     return location
