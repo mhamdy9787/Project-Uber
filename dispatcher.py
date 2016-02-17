@@ -24,9 +24,9 @@ class Dispatcher:
         @rtype: None
         """
         # TODO
-        self.driverFleet = []
-        self.availableDriver = []
-        self.waitingList = []
+        self.driverFleet = []#initializes a new list of drivers
+        self.availableDriver = []#Initializes a new list of unoccupied drivers
+        self.waitingList = []#List of waiting customers
 
 
 
@@ -35,10 +35,16 @@ class Dispatcher:
 
         @type self: Dispatcher
         @rtype: str
-        """
+        >>>self.driverFleet = ["bob","john","jimmy"]
+        >>>self.availableDriver = ["john"]
+        >>>self.waitingList = ["darren","wayne"]
+        >>>__str__()
+        ""Amount of Drivers: 3\nAmount of Available Drivers: 1\nAmount of Waiting Customers:2"
         # TODO
-        pass
-
+        return ("Amount of Drivers: {0}\n" #The number of drivers
+                "Amount of Available Drivers: {1}\n"#The number of available drivers
+                "Amount of Waiting Customers:{2}", format(len(self.driverFleet),len(self.availableDriver),len(self.waitingList))
+                #^The number of waiting customers
     def request_driver(self, rider):
         """Return a driver for the rider, or None if no driver is available.
 
@@ -47,12 +53,20 @@ class Dispatcher:
         @type self: Dispatcher
         @type rider: Rider
         @rtype: Driver | None
+        >>>self.waitingList = ["jack"]
+        >>>self.availableDriver = ["John"]
+        >>>request_driver("jack")
+        "John"
+        >>>self.waitingList = ["jack"]
+        >>>self.availableDriver = []
+        >>>request_driver("jack")
+        None
         """
         # TODO
-        if self.availableDriver == []:
+        if self.availableDriver == []:#If there are no avialble drivers then add the rider to the waiting list and return None
             self.waitingList.append(rider)
             return None
-        else:
+        else:#Else assign the rider to a driver by returning a driver
             nearestDriver = self.availableDriver[0]
             #Checking for which driver is closest to the rider.
             for driver in self.availableDriver:
@@ -71,15 +85,28 @@ class Dispatcher:
         @type self: Dispatcher
         @type driver: Driver
         @rtype: Rider | None
+        >>>self.waitingList = ["jack"]
+        >>>self.availableDriver = ["John"]
+        >>>request_rider("John")
+        "jack"
+        >>>self.waitingList = []
+        >>>self.availableDriver = ["John"]
+        >>>request_rider("John")
+        None
+        >>>self.waitingList = []
+        >>>self.availableDriver = ["John"]
+        >>>request_rider("John")
+        None
+        
         """
         # TODO
-        if driver not in self.driverFleet:
+        if driver not in self.driverFleet:#If isnt already in the list append them to the genral list and the available list
             self.driverFleet.append(driver)
             self.availableDriver.append(driver)
-        if self.waitingList == []:
+        if self.waitingList == []:#If there are no riders return None
             return None
         else:
-            return self.waitingList[0]
+            return self.waitingList[0]#If there is a rider then use then assign the first person in the queue
 
     def activateDriver(self,driver):
         #TODO
