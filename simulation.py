@@ -56,7 +56,9 @@ class Simulation:
             self._events.add(event)
         while not self._events.is_empty():
             currentEvent = self._events.remove()
+            print(currentEvent)
             additionalEvents = currentEvent.do(self._dispatcher,self._monitor)
+            print(additionalEvents)
             if additionalEvents != []:
                 for event in additionalEvents:
                     self._events.add(event)
