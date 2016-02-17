@@ -18,7 +18,7 @@ class Location:
         @rtype: str
         """
         # TODO
-        pass
+        return "{},{}".format(self.row,self.column)
 
     def __eq__(self, other):
         """Return True if self equals other, and false otherwise.
