@@ -30,3 +30,6 @@ class Rider:
     def updateStatus(self,newStatus):
 
         self.status = newStatus
+
+    def __str__(self):
+        return "{} {}".format(self.id,self.status)
