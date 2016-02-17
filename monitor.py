@@ -88,8 +88,7 @@ class Monitor:
         @type self: Monitor
         @rtype: str
         """
-        return "Monitor ({0} drivers, {1} riders)".format(
-                len(self._activities[DRIVER]), len(self._activities[RIDER]))
+        return "Monitor ({0} drivers, {1} riders)".format(len(self._activities[DRIVER]), len(self._activities[RIDER]))
 
     def notify(self, timestamp, category, description, identifier, location):
         """Notify the monitor of the activity.
@@ -155,7 +154,6 @@ class Monitor:
             for i in range(len(activities) -1):
                 distance += abs(activities[i].location.row - activities[i+1].location.row) + abs(activities[i].location.column - activities[i+1].location.column)
             numberOfDriver += 1
-
         return  distance / numberOfDriver
 
 
@@ -167,11 +165,10 @@ class Monitor:
         """
         # TODO
         averageRideDistance = 0
-        count = 0
+        count = len(self._activities[DRIVER].values())
 
         for activity in self._activities[RIDER].values():
-            if len(activity) >= 3:
+            if len(activity) == 3:
                 averageRideDistance += abs( activity[1].location.row - activity[2].location.row ) + abs(activity[1].location.column - activity[2].location.column)
-                count += 1
 
         return averageRideDistance / count
