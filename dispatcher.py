@@ -45,6 +45,8 @@ class Dispatcher:
                 "Amount of Available Drivers: {1}\n"#The number of available drivers
                 "Amount of Waiting Customers:{2}", format(len(self.driverFleet),len(self.availableDriver),len(self.waitingList))
                 #^The number of waiting customers
+                
+                
     def request_driver(self, rider):
         """Return a driver for the rider, or None if no driver is available.
 
@@ -93,11 +95,6 @@ class Dispatcher:
         >>>self.availableDriver = ["John"]
         >>>request_rider("John")
         None
-        >>>self.waitingList = []
-        >>>self.availableDriver = ["John"]
-        >>>request_rider("John")
-        None
-        
         """
         # TODO
         if driver not in self.driverFleet:#If isnt already in the list append them to the genral list and the available list
@@ -109,6 +106,15 @@ class Dispatcher:
             return self.waitingList[0]#If there is a rider then use then assign the first person in the queue
 
     def activateDriver(self,driver):
+        '''MAkes driver available for pickups.
+
+        @type self: Dispatcher
+        @type driver: Driver
+        @rtype: None
+        >>>driver1 = Driver
+        >>>activateDriver(driver1)
+        None
+        '''
         #TODO
 
         self.availableDriver.append(driver)
