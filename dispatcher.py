@@ -1,7 +1,6 @@
 from driver import Driver
 from rider import Rider
 
-
 class Dispatcher:
     """A dispatcher fulfills requests from riders and drivers for a
     ride-sharing service.
@@ -26,6 +25,7 @@ class Dispatcher:
         """
         # TODO
         self.driverFleet = []
+        self.availableDriver = []
         self.waitingList = []
 
 
@@ -49,14 +49,16 @@ class Dispatcher:
         @rtype: Driver | None
         """
         # TODO
-        if self.driverFleet == []:
+        if self.availableDriver == []:
             self.waitingList.append(rider)
             return None
         else:
-            nearestDriver = self.driverFleet[0]
+            nearestDriver = self.availableDriver[0]
             #Checking for which driver is closest to the rider.
-            for driver in self.driverFleet:
-                if driver.get_travel_time(rider.destination) < nearestDriver.get_travel_time(rider.destination):
+            for driver in self.availableDriver:
+                print(nearestDriver , nearestDriver.get_travel_time(rider.location) )
+                print(driver,driver.get_travel_time(rider.location))
+                if driver.get_travel_time(rider.location) < nearestDriver.get_travel_time(rider.location):
                     nearestDriver = driver
         return nearestDriver
 
@@ -73,18 +75,21 @@ class Dispatcher:
         # TODO
         if driver not in self.driverFleet:
             self.driverFleet.append(driver)
+            self.availableDriver.append(driver)
         if self.waitingList == []:
             return None
         else:
-            longestWaitingRider = self.waitingList[0]
-            for rider in self.waitingList:
-                if longestWaitingRider.patience  > rider.patience:
-                    longestWaitingRider = rider
-        return longestWaitingRider
+            return self.waitingList[0]
 
+    def activateDriver(self,driver):
+        #TODO
 
+        self.availableDriver.append(driver)
+        print(self.availableDriver)
+    def deActivateDriver(self,driver):
+        #TODO
 
-
+        self.availableDriver.remove(driver)
 
     def cancel_ride(self, rider):
         """Cancel the ride for rider.
@@ -94,4 +99,6 @@ class Dispatcher:
         @rtype: None
         """
         # TODO
-        self.waitingList.remove(rider)
+        if rider in self.waitingList:
+            self.waitingList.remove(rider)
+
