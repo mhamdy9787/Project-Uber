@@ -219,6 +219,7 @@ class RiderRequest(Event):
         events = []
         driver = dispatcher.request_driver(self.rider)
         if driver is not None:
+            dispatcher.deActivateDriver(driver)
             travel_time = driver.start_drive(self.rider.location)
             events.append(Pickup(self.timestamp + travel_time, self.rider, driver))
         events.append(Cancellation(self.timestamp + self.rider.patience, self.rider))
@@ -273,12 +274,14 @@ class DriverRequest(Event):
         monitor.notify(self.timestamp, DRIVER, REQUEST,
                        self.driver.id, self.driver.location)
         rider = dispatcher.request_rider(self.driver)
-
         events = []
         #start drive and create pick up event, the pick up event do() creates the drop off event!!
         if rider is not None:
+            print(rider)
+            dispatcher.deActivateDriver(self.driver)
             expectedTravelTime = self.driver.start_drive(rider.location)
-            events.append(Pickup(expectedTravelTime + self.timestamp,self.driver,rider))
+            events.append(Pickup(expectedTravelTime + self.timestamp,rider,self.driver))
+            print(expectedTravelTime)
         return events
     def __str__(self):
         """Return a string representation of this event.
@@ -290,7 +293,7 @@ class DriverRequest(Event):
 
 
 class Cancellation(Event):
-
+    #TODO
     def __init__(self,timestamp,rider):
         super().__init__(timestamp)
         self.rider = rider
@@ -299,10 +302,12 @@ class Cancellation(Event):
         """
 
         """
-        monitor.notify(self.timestamp, RIDER, CANCEL,self.rider.id,self.rider.location)
         events = []
-        dispatcher.cancel_ride(self.rider)
-        self.rider.updateStatus(CANCELLED)
+        if self.rider.status != SATISFIED:
+            monitor.notify(self.timestamp, RIDER, CANCEL,self.rider.id,self.rider.location)
+            print('check11')
+            dispatcher.cancel_ride(self.rider)
+            self.rider.updateStatus(CANCELLED)
 
         return events
 
@@ -312,7 +317,7 @@ class Cancellation(Event):
         return "{} -- {}: Cancellation".format(self.timestamp, self.rider)
 
 class Pickup(Event):
-
+    #TODO
     def __init__(self,timestamp,rider,driver):
         super().__init__(timestamp)
         self.driver = driver
@@ -323,13 +328,15 @@ class Pickup(Event):
 
         events = []
         if self.rider.status == WAITING:
-
             monitor.notify(self.timestamp,RIDER,PICKUP,self.rider.id,self.rider.location)
             monitor.notify(self.timestamp,DRIVER,PICKUP,self.driver.id,self.driver.location)#ASKKK!!!
             expectedRideTime = self.driver.start_ride(self.rider) #def start_ride() ==> self.location = self.destination
+            print("drive will take" + str(expectedRideTime))
+            self.rider.updateStatus(SATISFIED)
             events.append(Dropoff(self.timestamp + expectedRideTime,self.driver,self.rider))
-        elif self.rider.status == CANCEL:
-
+        elif self.rider.status == CANCELLED:
+            print("happen")
+            dispatcher.activateDriver(self.driver)
             events.append(DriverRequest(self.timestamp,self.driver))
             #WHEN IS CANCEL-RIDE CALLED ? (EVENT CLASS)
         return events
@@ -340,7 +347,7 @@ class Pickup(Event):
 
 
 class Dropoff(Event):
-
+    #TODO
     def __init__(self,timestamp,driver,rider):
         super().__init__(timestamp)
         self.driver = driver
@@ -351,8 +358,8 @@ class Dropoff(Event):
         self.driver.end_ride()
         monitor.notify(self.timestamp,RIDER,DROPOFF,self.rider.id,self.driver.location)
         #monitor.notify(self.timestamp,DRIVER,DROPOFF,self.rider,self.driver.location)
-        self.rider.updateStatus(SATISFIED)
-
+        dispatcher.activateDriver(self.driver)
+        dispatcher.cancel_ride(self.rider)
         events.append(DriverRequest(self.timestamp,self.driver))
 
         return events
@@ -404,7 +411,7 @@ def create_event_list(filename):
                 driverSpeed = int(tokens[4])
                 #is that all added to event?
                 driver = Driver(driverIdentification,driverLocation,driverSpeed)
-                event.append(DriverRequest(timestamp,driver))
+                events.append(DriverRequest(timestamp,driver))
 
             elif event_type == "RiderRequest":
                 # TODO
@@ -415,8 +422,7 @@ def create_event_list(filename):
                 riderPatience = int(tokens[5])
                 #is that all added to event?
                 rider  = Rider(riderIdentification,WAITING,riderDestination,riderLocation,riderPatience)
-                event.append(RiderRequest(timestamp,rider))
+                events.append(RiderRequest(timestamp,rider))
 
-            events.append(event)
 
     return events
